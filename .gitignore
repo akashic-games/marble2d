@@ -1,0 +1,6 @@
+node_modules/
+lib/
+doc/
+tmp/
+.DS_Store
+
