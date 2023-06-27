@@ -1,4 +1,5 @@
 import { Vec2Like, Vec2 as Vec2_, Transform } from "../math";
+import { PositionDigestBit } from "./PositionDigest";
 import { Shape } from "./Shape";
 
 // import した値をそのまま使うと TS のビルド方法によっては都度 getter 経由のアクセスになって遅い。
@@ -130,6 +131,11 @@ export class Body {
 	position: Vec2;
 
 	/**
+	 * 位置ダイジェスト。
+	 */
+	positionDigest: number;
+
+	/**
 	 * 速度。
 	 */
 	velocity: Vec2;
@@ -213,6 +219,7 @@ export class Body {
 		this.momentOfInertia = param.momentOfInertia;
 		this.invI = param.momentOfInertia !== 0 ? 1 / param.momentOfInertia : 0;
 		this.position = new Vec2(param.position);
+		this.positionDigest = PositionDigestBit.All;
 		this.angle = param.angle ?? 0;
 		this.velocity = new Vec2(param.velocity);
 		this.angularVelocity = param.angularVelocity ?? 0;

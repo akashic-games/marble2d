@@ -134,7 +134,10 @@ export function main(param: GameMainParameterObject): void {
 	// =====================================================================
 	// 物理世界の生成。
 	// =====================================================================
-	const world = new World({ iteration: 4 });
+	const world = new World({
+		center: { x: g.game.width / 2, y: g.game.height / 2 },
+		iteration: 4
+	});
 
 	// BodyEを破棄するユーティリティ関数。
 	const destroyBodyE = (e: BodyE | null | undefined): void => {

@@ -1,6 +1,7 @@
 import { Vec2, Vec2Like } from "../math";
 import { Arbiter, createArbiterIfContacts as createArbiterIfContacts_ } from "./Arbiter";
 import { Body } from "./Body";
+import { PositionDigestBit, PositionDigestBitShift } from "./PositionDigest";
 
 const createArbiterIfContacts = createArbiterIfContacts_;
 
@@ -8,6 +9,11 @@ const createArbiterIfContacts = createArbiterIfContacts_;
  * ワールドコンストラクタパラメータオブジェクト。
  */
 export interface WorldParameterObject {
+	/**
+	 * 中心座標。
+	 */
+	center: Vec2Like;
+
 	/**
 	 *  重力加速度。
 	 *
@@ -43,6 +49,11 @@ export interface WorldParameterObject {
  * ワールドクラス。
  */
 export class World {
+	/**
+	 * 中心座標。
+	 */
+	center: Vec2;
+
 	/**
 	 * 重力加速度。
 	 */
@@ -81,7 +92,8 @@ export class World {
 	 *
 	 * @param param コンストラクタパラメタ。
 	 */
-	constructor(param: WorldParameterObject = {}) {
+	constructor(param: WorldParameterObject) {
+		this.center = new Vec2(param.center);
 		this.gravity = new Vec2(param.gravity ?? { x: 0, y: 600 });
 
 		this.subStep = param.subStep ?? 4;
@@ -161,6 +173,13 @@ export class World {
 			const bodyA = bodies[i];
 			for (let j = i + 1; j < bodiesLen; j++) {
 				const bodyB = bodies[j];
+				const collisionDigest = bodyA.positionDigest & bodyB.positionDigest;
+				if (
+					(collisionDigest & PositionDigestBit.X) === PositionDigestBit.None ||
+					(collisionDigest & PositionDigestBit.Y) === PositionDigestBit.None
+				) {
+					continue;
+				}
 				const arbiter = createArbiterIfContacts(bodyA, bodyB)
 				if (arbiter) {
 					arbiters.push(arbiter);
@@ -215,6 +234,9 @@ export class World {
 	}
 
 	private integrateVelocity(dt: number): void {
+		const cx = this.center.x;
+		const cy = this.center.y;
+
 		for (let i = 0; i < this.bodies.length; i++) {
 			const body = this.bodies[i]!;
 
@@ -228,7 +250,21 @@ export class World {
 			body.velocity.scale(1.0 / (1.0 + dt * body.linearDamping));
 			body.angularVelocity *= 1.0 / (1.0 + dt * body.angularDamping);
 
-			body.position.add(body.velocity.clone().scale(dt));
+			// this.position.add(body.velocity.clone().scale(dt));
+			const { position: pos, velocity: vel } = body;
+			const dx = vel.x * dt;
+			const dy = vel.y * dt;
+			const x = pos.x += dx;
+			const y = pos.y += dy;
+
+			const _bounds = body.shape._bounds;
+			body.positionDigest = (
+				(+(x - _bounds < cx) << PositionDigestBitShift.Left) |
+				(+(x + _bounds >= cx) << PositionDigestBitShift.Right) |
+				(+(y - _bounds < cy) << PositionDigestBitShift.Top) |
+				(+(y + _bounds >= cy) << PositionDigestBitShift.Bottom)
+			);
+
 			body.angle += body.angularVelocity * dt;
 		}
 	}
