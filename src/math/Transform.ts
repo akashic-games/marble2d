@@ -1,6 +1,9 @@
 import { Rot } from "./Rot";
-import { Vec2 } from "./Vec2";
+import { Vec2 as Vec2_ } from "./Vec2";
 import { Vec2Like } from "./Vec2Like";
+
+type Vec2 = Vec2_;
+const Vec2 = Vec2_;
 
 /**
  * トランスフォーム。

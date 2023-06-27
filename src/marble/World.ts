@@ -1,6 +1,8 @@
 import { Vec2, Vec2Like } from "../math";
-import { Arbiter } from "./Arbiter";
+import { Arbiter, createArbiterIfContacts as createArbiterIfContacts_ } from "./Arbiter";
 import { Body } from "./Body";
+
+const createArbiterIfContacts = createArbiterIfContacts_;
 
 /**
  * ワールドコンストラクタパラメータオブジェクト。
@@ -154,12 +156,13 @@ export class World {
 
 		// このループ内で bodies 配列の要素が null であるか確認することを避ける。
 		// 剛体が多い時、処理時間に大きく影響する。
-		for (let i = 0; i < bodies.length - 1; i++) {
+		const bodiesLen = bodies.length;
+		for (let i = 0; i < bodiesLen - 1; i++) {
 			const bodyA = bodies[i];
-			for (let j = i + 1; j < this.bodies.length; j++) {
+			for (let j = i + 1; j < bodiesLen; j++) {
 				const bodyB = bodies[j];
-				const arbiter = new Arbiter(bodyA, bodyB);
-				if (arbiter.contacts.length > 0) {
+				const arbiter = createArbiterIfContacts(bodyA, bodyB)
+				if (arbiter) {
 					arbiters.push(arbiter);
 				}
 			}
