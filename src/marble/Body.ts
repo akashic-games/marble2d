@@ -2,7 +2,7 @@ import { Vec2Like, Vec2 as Vec2_, Transform } from "../math";
 import { Shape } from "./Shape";
 
 // import した値をそのまま使うと TS のビルド方法によっては都度 getter 経由のアクセスになって遅い。
-// コンテンツによるが数パーセントレベルで速度劣化する。それを避けるためアクセス頻度の高い値をローカルで定義する。
+// そのためアクセス頻度の高い値をローカルで定義する。
 type Vec2 = Vec2_;
 const Vec2 = Vec2_;
 
