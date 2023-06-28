@@ -1,8 +1,12 @@
-import { Vec2, Vec2Like } from "../math";
+import { Vec2 as Vec2_, Vec2Like } from "../math";
 import { Arbiter, createArbiterIfContacts as createArbiterIfContacts_ } from "./Arbiter";
 import { Body } from "./Body";
 import { PositionDigestBit, PositionDigestBitShift } from "./PositionDigest";
 
+// import した値をそのまま使うと TS のビルド方法によっては都度 getter 経由のアクセスになって遅い。
+// そのためアクセス頻度の高い値をローカルで定義する。
+type Vec2 = Vec2_;
+const Vec2 = Vec2_;
 const createArbiterIfContacts = createArbiterIfContacts_;
 
 /**
@@ -180,7 +184,7 @@ export class World {
 				) {
 					continue;
 				}
-				const arbiter = createArbiterIfContacts(bodyA, bodyB)
+				const arbiter = createArbiterIfContacts(bodyA, bodyB);
 				if (arbiter) {
 					arbiters.push(arbiter);
 				}
