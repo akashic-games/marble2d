@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/akashic-games/marble2d/master/img/akashic.png"/>
+<img src="https://raw.githubusercontent.com/akashic-games/marble2d/main/img/akashic.png"/>
 </p>
 
 # Marble2D
