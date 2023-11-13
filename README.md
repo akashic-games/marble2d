@@ -34,7 +34,7 @@ Akashic Engineの詳細な利用方法については、 [公式ページ](https
 
 ## APIリファレンス
 
-https://akashic-games.github.io/reference/marble2d/index.html
+https://akashic-games.github.io/marble2d/index.html
 
 ## ビルド方法
 
