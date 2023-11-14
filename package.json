@@ -6,8 +6,8 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "rimraf ./lib && tsc -p ./tsconfig.json",
-    "clean": "rimraf ./lib ./doc",
-    "doc": "typedoc --out ./doc ./src/index.ts",
+    "clean": "rimraf ./lib ./public",
+    "doc": "typedoc --out ./public/api ./src/index.ts",
     "watch": "tsc --watch",
     "test": "jest"
   },

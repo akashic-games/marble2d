@@ -1,5 +1,5 @@
 <p align="center">
-<img src="img/akashic.png"/>
+<img src="https://raw.githubusercontent.com/akashic-games/marble2d/main/img/akashic.png"/>
 </p>
 
 # Marble2D
@@ -34,7 +34,7 @@ Akashic Engineの詳細な利用方法については、 [公式ページ](https
 
 ## APIリファレンス
 
-https://akashic-games.github.io/reference/marble2d/index.html
+https://akashic-games.github.io/marble2d/api/index.html
 
 ## ビルド方法
 
