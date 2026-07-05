@@ -1,4 +1,4 @@
-import { Vec2, Vec2Like, clamp } from "../math";
+import { Vec2 as Vec2_, Vec2Like, clamp as clamp_ } from "../math";
 import { Body } from "./Body";
 import {
 	collisionCircleVsCircle,
@@ -6,6 +6,12 @@ import {
 	collisionPolygonVsPolygon,
 	Contact
 } from "./Contact";
+
+// import した値をそのまま使うと TS のビルド方法によっては都度 getter 経由のアクセスになって遅い。
+// そのためアクセス頻度の高い値をローカルで定義する。
+type Vec2 = Vec2_;
+const Vec2 = Vec2_;
+const clamp = clamp_;
 
 /**
  * v1 x v2 x v3 を計算する。
@@ -142,6 +148,49 @@ export function applyImpulse(contact: Contact): void {
 	bodyB.applyImpulse(rb, Pt);
 }
 
+declare function neverReach(x: never): never;
+
+export function createArbiterIfContacts(bodyA: Body, bodyB: Body): Arbiter | null {
+	const typeA = bodyA.shape.type;
+	const typeB = bodyB.shape.type;
+
+	switch (typeA) {
+		case "circle": {
+			switch (typeB) {
+				case "circle": {
+					const contact = collisionCircleVsCircle(bodyA, bodyB);
+					return contact ? new Arbiter([contact]) : null;
+				}
+				case "polygon": {
+					const contact = collisionPolygonVsCircle(bodyB, bodyA);
+					return contact ? new Arbiter([contact]) : null;
+				}
+				default: {
+					neverReach(typeB);
+				}
+			}
+		}
+		case "polygon": {
+			switch (typeB) {
+				case "circle": {
+					const contact = collisionPolygonVsCircle(bodyA, bodyB);
+					return contact ? new Arbiter([contact]) : null;
+				}
+				case "polygon": {
+					const contacts = collisionPolygonVsPolygon(bodyA, bodyB);
+					return (contacts && contacts.length > 0) ? new Arbiter(contacts) : null;
+				}
+				default: {
+					neverReach(typeB);
+				}
+			}
+		}
+		default: {
+			neverReach(typeA);
+		}
+	}
+}
+
 /**
  * 剛体の接触の解決役。
  *
@@ -153,35 +202,8 @@ export class Arbiter {
 	 */
 	contacts: Contact[];
 
-	constructor(bodyA: Body, bodyB: Body) {
-		this.contacts = [];
-
-		const shapeA = bodyA.shape;
-		const shapeB = bodyB.shape;
-
-		if (shapeA.type === "circle" && shapeB.type === "circle") {
-			const contact = collisionCircleVsCircle(bodyA, bodyB);
-			if (contact) {
-				this.contacts.push(contact);
-			}
-		} else if (shapeA.type === "polygon" && shapeB.type === "circle") {
-			const contact = collisionPolygonVsCircle(bodyA, bodyB);
-			if (contact) {
-				this.contacts.push(contact);
-			}
-		} else if (shapeA.type === "circle" && shapeB.type === "polygon") {
-			const contact = collisionPolygonVsCircle(bodyB, bodyA);
-			if (contact) {
-				this.contacts.push(contact);
-			}
-		} else if (shapeA.type === "polygon" && shapeB.type === "polygon") {
-			const contacts = collisionPolygonVsPolygon(bodyA, bodyB);
-			if (contacts) {
-				for (const contact of contacts) {
-					this.contacts.push(contact);
-				}
-			}
-		}
+	constructor(contacts: Contact[]) {
+		this.contacts = contacts;
 	}
 
 	preStep(invDt: number): void {

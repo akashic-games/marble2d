@@ -1,5 +1,5 @@
 import { Vec2Like, clamp } from "../../math";
-import { Arbiter, applyImpulse, crossCross } from "../../marble/Arbiter";
+import { Arbiter, applyImpulse, createArbiterIfContacts, crossCross } from "../../marble/Arbiter";
 import { Body } from "../../marble/Body";
 import { CircleShape } from "../../marble/CircleShape";
 import { Contact } from "../../marble/Contact";
@@ -192,7 +192,7 @@ describe("Arbiter.preStep", () => {
     it("is equivalent to ref.Arbiter.preStep", () => {
         const [bodyA, bodyB] = createBodies();
         const arbiter1 = new ref.Arbiter(bodyA, bodyB);
-        const arbiter2 = new Arbiter(bodyA, bodyB);
+        const arbiter2 = createArbiterIfContacts(bodyA, bodyB)!;
 
         expect(arbiter2.contacts.length).toEqual(arbiter1.contacts.length);
         expect(arbiter2.contacts[0].mass).toEqual(arbiter1.contacts[0].mass);
@@ -208,7 +208,7 @@ describe("Arbiter.preStep", () => {
     it("runs faster", () => {
         const [bodyA, bodyB] = createBodies();
         const arbiter1 = new ref.Arbiter(bodyA, bodyB);
-        const arbiter2 = new Arbiter(bodyA, bodyB);
+        const arbiter2 = createArbiterIfContacts(bodyA, bodyB)!;
         const numIteration = 100000;
 
         let now: number;
@@ -279,7 +279,7 @@ describe("Arbiter.applyImpulse", () => {
         const apply = (applyer: (c: Contact) => void): Contact => {
             const [bodyA, bodyB] = createBodies();
             const dt = 1 / 30;
-            const arbiter = new Arbiter(bodyA, bodyB);
+            const arbiter = createArbiterIfContacts(bodyA, bodyB)!;
 
             arbiter.preStep(1 / dt);
 
@@ -312,7 +312,7 @@ describe("Arbiter.applyImpulse", () => {
         const bodyAAV = bodyA.angularVelocity;
         const bodyBAV = bodyB.angularVelocity;
         const dt = 1 / 30;
-        const arbiter = new Arbiter(bodyA, bodyB);
+        const arbiter = createArbiterIfContacts(bodyA, bodyB)!;
 
         arbiter.preStep(1 / dt);
 
